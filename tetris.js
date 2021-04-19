@@ -89,9 +89,9 @@ class Tetromino {
       }))
     } else {
       this.shape.forEach((e, i) => e.forEach((e2, j) => {
-        if (i + this.x >= 10) {
+        if (e2 && i + this.x >= 10) {
           this.moveSideways(-1)
-        } else if (i + this.x < 0) {
+        } else if (e2 && i + this.x < 0) {
           this.moveSideways(1)
         }
         newShape[this.width - 1 - j].push(this.shape[i][j])
@@ -104,8 +104,8 @@ class Tetromino {
     let hasCollided = false
     this.shape.forEach((e, i) => {
       e.forEach((e2, j) => {
-        if (e2 === true && this.y + i > 0 && (this.y + i === 19 || cells[this.x + j][this.y + i + 1].hasTetromino)) {
-          hasCollided = true
+        if (!(!e2 || this.y + i < 0) && (e2 === true && (this.y + i === 19 || cells[this.x + j][this.y + i + 1].hasTetromino))) {
+          hasCollided = true 
           hardFall = false
         }
       })
@@ -113,9 +113,9 @@ class Tetromino {
     if (hasCollided) {
       if (this.y < 0) {
         this.gameOver()
-        return hasCollided
+      } else {
+        updateScore(18)
       }
-      updateScore(18)
       this.shape.forEach((e, i) => {
         e.forEach((e2, j) => {
           if (e2) {
@@ -129,6 +129,7 @@ class Tetromino {
 
   gameOver() {
     gameOver = true
+    alert(`GAME OVER!\nYou scored ${score} points`)
   }
 }
 
@@ -148,6 +149,13 @@ let level = 0
 let score = 0
 let linesCleared = 0
 let gameOver = false
+let r = Math.floor(Math.random() * 7)
+const r2 = Math.floor(Math.random() * 7)
+const tetrominos = [new Tetromino(tetrominoChoices[r].shape, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shape, tetrominoChoices[r2].color)]
+let currentTetromino = 0
+let speed = 750
+let softFall = false
+let hardFall = false
 
 for (let x = 0; x < 10; x++) {
   const tempArray = []
@@ -180,14 +188,6 @@ for (let x = 0; x < 4; x++) {
   nextCells.push(tempArray)
 }
 
-let r = Math.floor(Math.random() * 7)
-const r2 = Math.floor(Math.random() * 7)
-const tetrominos = [new Tetromino(tetrominoChoices[r].shape, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shape, tetrominoChoices[r2].color)]
-let currentTetromino = 0
-let softFall = false
-let speed = 500
-let hardFall = false
-
 function playGame() {
   if (!gameOver) {
     const newTet = tetrominos[currentTetromino].drop()
@@ -199,7 +199,11 @@ function playGame() {
     }
     tetrominos[currentTetromino + 1].displayNext()
     if (hardFall) {
-      playGame()
+      playGame() 
+    } else if (softFall) {
+      setTimeout(() => {
+        playGame()
+      }, 50) 
     } else {
       setTimeout(() => {
         playGame()
@@ -211,8 +215,6 @@ function playGame() {
 
 document.addEventListener('keydown', e => {
   const key = e.key
-  console.log(key)
-
   if (key === 'x') {
     tetrominos[currentTetromino].rotate(true)
     tetrominos[currentTetromino].display()
@@ -227,7 +229,6 @@ document.addEventListener('keydown', e => {
     tetrominos[currentTetromino].display()
   } else if (key === 'ArrowDown') {
     softFall = true
-    speed = 50
   } else if (key === ' ') {
     if (!hardFall) hardFall = true
   }
@@ -236,7 +237,6 @@ document.addEventListener('keydown', e => {
 document.addEventListener('keyup', e => {
   if (e.key === 'ArrowDown') {
     softFall = false
-    speed = 500
   } 
 })
 
@@ -291,8 +291,9 @@ function levelCheck() {
   console.log(linesCleared)
   if (linesCleared >= ((level + 1) * 10)) {
     level++
-    linesCleared -= (level * 10)
+    //linesCleared -= (level * 10)
     elements.level.innerHTML = level
+    speed *= 0.8
   }
 }
 
