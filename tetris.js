@@ -106,10 +106,15 @@ class Tetromino {
       e.forEach((e2, j) => {
         if (e2 === true && this.y + i > 0 && (this.y + i === 19 || cells[this.x + j][this.y + i + 1].hasTetromino)) {
           hasCollided = true
+          hardFall = false
         }
       })
     })
     if (hasCollided) {
+      if (this.y < 0) {
+        this.gameOver()
+        return hasCollided
+      }
       updateScore(18)
       this.shape.forEach((e, i) => {
         e.forEach((e2, j) => {
@@ -120,6 +125,10 @@ class Tetromino {
       })
     }
     return hasCollided
+  }
+
+  gameOver() {
+    gameOver = true
   }
 }
 
@@ -138,6 +147,7 @@ const nextCells = []
 let level = 0
 let score = 0
 let linesCleared = 0
+let gameOver = false
 
 for (let x = 0; x < 10; x++) {
   const tempArray = []
@@ -174,24 +184,34 @@ let r = Math.floor(Math.random() * 7)
 const r2 = Math.floor(Math.random() * 7)
 const tetrominos = [new Tetromino(tetrominoChoices[r].shape, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shape, tetrominoChoices[r2].color)]
 let currentTetromino = 0
+let softFall = false
+let speed = 500
+let hardFall = false
 
 function playGame() {
-  const newTet = tetrominos[currentTetromino].drop()
-  if (newTet) {
-    r = Math.floor(Math.random() * 7)
-    tetrominos.push(new Tetromino(tetrominoChoices[r].shape, tetrominoChoices[r].color))
-    checkTetris()
-    currentTetromino++
+  if (!gameOver) {
+    const newTet = tetrominos[currentTetromino].drop()
+    if (newTet) {
+      r = Math.floor(Math.random() * 7)
+      tetrominos.push(new Tetromino(tetrominoChoices[r].shape, tetrominoChoices[r].color))
+      checkTetris()
+      currentTetromino++
+    }
+    tetrominos[currentTetromino + 1].displayNext()
+    if (hardFall) {
+      playGame()
+    } else {
+      setTimeout(() => {
+        playGame()
+      }, speed) 
+    }
   }
-  tetrominos[currentTetromino + 1].displayNext()
-  setTimeout(() => {
-    playGame()
-  }, 500)
 }
 
 
 document.addEventListener('keydown', e => {
   const key = e.key
+  console.log(key)
 
   if (key === 'x') {
     tetrominos[currentTetromino].rotate(true)
@@ -205,7 +225,19 @@ document.addEventListener('keydown', e => {
   } else if (key === 'ArrowRight') {
     tetrominos[currentTetromino].moveSideways(1)
     tetrominos[currentTetromino].display()
+  } else if (key === 'ArrowDown') {
+    softFall = true
+    speed = 50
+  } else if (key === ' ') {
+    if (!hardFall) hardFall = true
   }
+})
+
+document.addEventListener('keyup', e => {
+  if (e.key === 'ArrowDown') {
+    softFall = false
+    speed = 500
+  } 
 })
 
 function checkTetris() {
