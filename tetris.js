@@ -1,6 +1,7 @@
 const elements = {
   gameScreen: document.querySelector('#game-screen'),
   score: document.querySelector('#score'),
+  highScore: document.querySelector('#high-score'),
   level: document.querySelector('#level'),
   next: document.querySelector('#next-tetromino'),
 }
@@ -57,14 +58,17 @@ class Tetromino {
   moveSideways(direction) {
     let canMove = true
     this.shape.forEach((e, i) => e.forEach((e2, j) => {
-      if ((e2 && (!cells[this.x + j + direction][this.y + i + direction] || 
+      if (this.y + i <= 0 && this.x + j > 0 && this.x + j < 9) {
+        canMove = true
+      } else if ((e2 && (!cells[this.x + j + direction][this.y + i + direction] || 
         cells[this.x + j + direction][this.y + i + direction].hasTetromino) )) {
         canMove = false
       } 
     }))
+    
     if (canMove) {
       this.shape.forEach((e, i) => e.forEach((e2, j) => {
-        if (cells[this.x + j] && !cells[this.x + j][this.y + i].hasTetromino) {
+        if (this.y + i >= 0 && e2 && cells[this.x + j] && !cells[this.x + j][this.y + i].hasTetromino) {
           cells[this.x + j][this.y + i].div.style = 'background-color: black'
         }
       }))
@@ -129,7 +133,11 @@ class Tetromino {
 
   gameOver() {
     gameOver = true
-    alert(`GAME OVER!\nYou scored ${score} points`)
+    if (checkHighScore()) {
+      alert(`You beat the high score!\nYou scored ${score} points`)
+    } else {
+      alert(`GAME OVER!\nYou scored ${score} points`)
+    }
   }
 }
 
@@ -147,6 +155,7 @@ const cells = []
 const nextCells = []
 let level = 0
 let score = 0
+let highScore = localStorage.getItem('highScore')
 let linesCleared = 0
 let gameOver = false
 let r = Math.floor(Math.random() * 7)
@@ -156,6 +165,11 @@ let currentTetromino = 0
 let speed = 750
 let softFall = false
 let hardFall = false
+
+if (!highScore) {
+  highScore = 0
+}
+elements.highScore.innerHTML = highScore
 
 for (let x = 0; x < 10; x++) {
   const tempArray = []
@@ -288,13 +302,22 @@ function updateScore(points) {
 }
 
 function levelCheck() {
-  console.log(linesCleared)
   if (linesCleared >= ((level + 1) * 10)) {
     level++
     //linesCleared -= (level * 10)
     elements.level.innerHTML = level
     speed *= 0.8
   }
+}
+
+function checkHighScore() {
+  if (score > highScore) {
+    highScore = score
+    localStorage.setItem('highScore', highScore)
+    elements.highScore.innerHTML = highScore
+    return true
+  }
+  return false
 }
 
 playGame()
