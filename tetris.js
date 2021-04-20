@@ -4,50 +4,51 @@ const elements = {
   highScore: document.querySelector('#high-score'),
   level: document.querySelector('#level'),
   next: document.querySelector('#next-tetromino'),
+  hold: document.querySelector('#hold-tetromino'),
 }
 
 class Tetromino {
   constructor(shape, color) {
     this.width = shape.length
-    this.shape = shape
+    this.shapeArray = shape
     this.color = color
-    this.x = 3
+    this.width === 2 ? this.x = 4 : this.x = 3
     this.y = 0 - this.width
   }
-
+  //Display Tetrimino on game screen
   display() {
-    this.shape.forEach((e, i) => e.forEach((e2, j) => {
-      if (e2 && (this.y + i >= 0)) {
+    this.shapeArray.forEach((shapeArray, i) => shapeArray.forEach((cell, j) => {
+      if (cell && (this.y + i >= 0)) {
         cells[this.x + j][this.y + i].color = this.color
-        cells[this.x + j][this.y + i].div.style = 'background-color: ' + this.color
+        cells[this.x + j][this.y + i].element.style = `background-color: ${this.color}; box-shadow: inset 0 0 0px 1px darkgrey;`
       } else if (!(this.y + i > 19) && (this.y + i >= 0) && cells[this.x + j] && !cells[this.x + j][this.y + i].hasTetromino) {
-        cells[this.x + j][this.y + i].div.style = 'background-color: black'
+        cells[this.x + j][this.y + i].element.style = 'background-color: black'
       }
     }))
   }
-  
-  displayNext() {
+  //Display Tetrimino for either next or hold 
+  displaySmall(array) {
     for (let x = 0; x < 4; x++) {
       for (let y = 0; y < 4; y++) {
-        if (x < this.width && y < this.width && this.shape[x][y]) {
-          nextCells[x][y].color = this.color
-          nextCells[x][y].div.style = 'background-color: ' + this.color
+        if (x < this.width && y < this.width && this.shapeArray[x][y]) {
+          array[x][y].color = this.color
+          array[x][y].element.style = `background-color: ${this.color}; box-shadow: inset 0 0 0px 1px darkgrey;`
         } else {
-          nextCells[x][y].div.style = 'background-color: black'
+          array[x][y].element.style = 'background-color: black'
         }
       }
     }
   }
-
+  //moves Tetrimino down one cell if possible
   drop() {
     if (this.collisionDetection()) {
       return true
     }
-    this.shape.forEach((e, i) => e.forEach((e2, j) => {
-      if (!e2 && (!cells[this.x + j])) {
+    this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+      if (!cell && (!cells[this.x + j])) {
         console.log(cells[this.x + j])
       } else if ((this.y + i >= 0) && !cells[this.x + j][this.y + i].hasTetromino) {
-        cells[this.x + j][this.y + i].div.style = 'background-color: black'
+        cells[this.x + j][this.y + i].element.style = 'background-color: black'
       }
     }))
     this.y++
@@ -57,19 +58,19 @@ class Tetromino {
 
   moveSideways(direction) {
     let canMove = true
-    this.shape.forEach((e, i) => e.forEach((e2, j) => {
+    this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
       if (this.y + i <= 0 && this.x + j > 0 && this.x + j < 9) {
         canMove = true
-      } else if ((e2 && (!cells[this.x + j + direction][this.y + i + direction] || 
+      } else if ((cell && (!cells[this.x + j + direction][this.y + i + direction] || 
         cells[this.x + j + direction][this.y + i + direction].hasTetromino) )) {
         canMove = false
       } 
     }))
     
     if (canMove) {
-      this.shape.forEach((e, i) => e.forEach((e2, j) => {
-        if (this.y + i >= 0 && e2 && cells[this.x + j] && !cells[this.x + j][this.y + i].hasTetromino) {
-          cells[this.x + j][this.y + i].div.style = 'background-color: black'
+      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+        if (this.y + i >= 0 && cell && cells[this.x + j] && !cells[this.x + j][this.y + i].hasTetromino) {
+          cells[this.x + j][this.y + i].element.style = 'background-color: black'
         }
       }))
       this.x += direction
@@ -83,50 +84,44 @@ class Tetromino {
       newShape.push([])
     }
     if (isClockwise) {
-      this.shape.forEach((e, i) => e.forEach((e2, j) => {
+      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
         if (i + this.x >= 10) {
           this.moveSideways(-1)
         } else if (i + this.x <= 0) {
           this.moveSideways(1)
         }
-        newShape[j].unshift(this.shape[i][j])
+        newShape[j].unshift(this.shapeArray[i][j])
       }))
     } else {
-      this.shape.forEach((e, i) => e.forEach((e2, j) => {
-        if (e2 && i + this.x >= 10) {
+      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+        if (cell && i + this.x >= 10) {
           this.moveSideways(-1)
-        } else if (e2 && i + this.x < 0) {
+        } else if (cell && i + this.x < 0) {
           this.moveSideways(1)
         }
-        newShape[this.width - 1 - j].push(this.shape[i][j])
+        newShape[this.width - 1 - j].push(this.shapeArray[i][j])
       }))
     }
-    this.shape = newShape
+    this.shapeArray = newShape
   }
 
   collisionDetection() {
     let hasCollided = false
-    this.shape.forEach((e, i) => {
-      e.forEach((e2, j) => {
-        if (!(!e2 || this.y + i < 0) && (e2 === true && (this.y + i === 19 || cells[this.x + j][this.y + i + 1].hasTetromino))) {
-          hasCollided = true 
-          hardFall = false
-        }
-      })
-    })
+    this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+      if (!(!cell || this.y + i < 0) && (cell === true && (this.y + i === 19 || cells[this.x + j][this.y + i + 1].hasTetromino))) {
+        hasCollided = true 
+        hardFall = false
+      }
+    }))
     if (hasCollided) {
       if (this.y < 0) {
         this.gameOver()
       } else {
         updateScore(18)
       }
-      this.shape.forEach((e, i) => {
-        e.forEach((e2, j) => {
-          if (e2) {
-            cells[this.x + j][this.y + i].hasTetromino = true
-          }
-        })
-      })
+      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+        if (cell) cells[this.x + j][this.y + i].hasTetromino = true
+      }))
     }
     return hasCollided
   }
@@ -139,20 +134,29 @@ class Tetromino {
       alert(`GAME OVER!\nYou scored ${score} points`)
     }
   }
+
+  remove() {
+    this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+      if (cell && cells[this.x + j][this.y + i]) {
+        cells[this.x + j][this.y + i].element.style = 'background-color: black'
+      }
+    }))
+  }
 }
 
 const tetrominoChoices = [
-  { shape: [[false, false, false], [true, true, true], [false, true, false]], color: '#ff00ff' },
-  { shape: [[false, false, false], [true, true, true], [false, false, true]], color: '#00ff00' },
-  { shape: [[false, false, false], [true, true, true], [true, false, false]], color: '#0066ff' },
-  { shape: [[false, false, false], [true, true, false], [false, true, true]], color: '#ff0000' },
-  { shape: [[false, false, false], [false, true, true], [true, true, false]], color: '#ff9900' },
-  { shape: [[false, false, false, false], [false, false, false, false], [true, true, true, true], [false, false, false, false]], color: '#66ffff' },
-  { shape: [[true, true], [true, true]], color: '#9900cc' }
+  { shapeArray: [[false, false, false], [true, true, true], [false, true, false]], color: '#ff00ff' },
+  { shapeArray: [[false, false, false], [true, true, true], [false, false, true]], color: '#00ff00' },
+  { shapeArray: [[false, false, false], [true, true, true], [true, false, false]], color: '#0066ff' },
+  { shapeArray: [[false, false, false], [true, true, false], [false, true, true]], color: '#ff0000' },
+  { shapeArray: [[false, false, false], [false, true, true], [true, true, false]], color: '#ff9900' },
+  { shapeArray: [[false, false, false, false], [false, false, false, false], [true, true, true, true], [false, false, false, false]], color: '#66ffff' },
+  { shapeArray: [[true, true], [true, true]], color: '#9900cc' }
 ]
 
 const cells = []
 const nextCells = []
+const holdCells = []
 let level = 0
 let score = 0
 let highScore = localStorage.getItem('highScore')
@@ -160,11 +164,15 @@ let linesCleared = 0
 let gameOver = false
 let r = Math.floor(Math.random() * 7)
 const r2 = Math.floor(Math.random() * 7)
-const tetrominos = [new Tetromino(tetrominoChoices[r].shape, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shape, tetrominoChoices[r2].color)]
+const tetrominos = [new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shapeArray, tetrominoChoices[r2].color)]
 let currentTetromino = 0
 let speed = 750
 let softFall = false
 let hardFall = false
+let heldT
+
+smallDisplay(elements.next, nextCells)
+smallDisplay(elements.hold, holdCells)
 
 if (!highScore) {
   highScore = 0
@@ -179,7 +187,7 @@ for (let x = 0; x < 10; x++) {
     elements.gameScreen.appendChild(cellDiv)
     const cell = {
       hasTetromino: false,
-      div: cellDiv,
+      element: cellDiv,
       color: 'black',
     }
     tempArray.push(cell)
@@ -187,19 +195,21 @@ for (let x = 0; x < 10; x++) {
   cells.push(tempArray)
 }
 
-for (let x = 0; x < 4; x++) {
-  const tempArray = []
-  for (let y = 0; y < 4; y++) {
-    const cellDiv = document.createElement('div')
-    cellDiv.classList.add('next-cell')
-    elements.next.appendChild(cellDiv)
-    const cell = {
-      div: cellDiv,
-      color: 'black',
+function smallDisplay(div, array) { 
+  for (let x = 0; x < 4; x++) {
+    const tempArray = []
+    for (let y = 0; y < 4; y++) {
+      const cellDiv = document.createElement('div')
+      cellDiv.classList.add('small-display-cell')
+      div.appendChild(cellDiv)
+      const cell = {
+        element: cellDiv,
+        color: 'black',
+      }
+      tempArray.push(cell)
     }
-    tempArray.push(cell)
+    array.push(tempArray)
   }
-  nextCells.push(tempArray)
 }
 
 function playGame() {
@@ -207,11 +217,11 @@ function playGame() {
     const newTet = tetrominos[currentTetromino].drop()
     if (newTet) {
       r = Math.floor(Math.random() * 7)
-      tetrominos.push(new Tetromino(tetrominoChoices[r].shape, tetrominoChoices[r].color))
+      tetrominos.push(new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color))
       checkTetris()
       currentTetromino++
     }
-    tetrominos[currentTetromino + 1].displayNext()
+    tetrominos[currentTetromino + 1].displaySmall(nextCells)
     if (hardFall) {
       playGame() 
     } else if (softFall) {
@@ -245,6 +255,8 @@ document.addEventListener('keydown', e => {
     softFall = true
   } else if (key === ' ') {
     if (!hardFall) hardFall = true
+  } else if (key === 'ArrowUp') {
+    holdTetromino()
   }
 })
 
@@ -287,10 +299,10 @@ function removeRow(y) {
       cells[x][i].hasTetromino = tempCell.hasTetromino
       if (tempCell.hasTetromino) {
         cells[x][i].color = tempCell.color
-        cells[x][i].div.style = 'background-color: ' + tempCell.color
+        cells[x][i].element.style = `background-color: ${tempCell.color}; box-shadow: inset 0 0 0px 1px darkgrey;`
       } else {
         cells[x][i].color = 'black'
-        cells[x][i].div.style = 'background-color: black'
+        cells[x][i].element.style = 'background-color: black'
       }
     }
   }
@@ -304,7 +316,6 @@ function updateScore(points) {
 function levelCheck() {
   if (linesCleared >= ((level + 1) * 10)) {
     level++
-    //linesCleared -= (level * 10)
     elements.level.innerHTML = level
     speed *= 0.8
   }
@@ -318,6 +329,26 @@ function checkHighScore() {
     return true
   }
   return false
+}
+
+function holdTetromino() {
+  if (heldT) {
+    const tempT = tetrominos[currentTetromino]
+    tetrominos[currentTetromino] = heldT
+    heldT = tempT
+    console.log('held')
+  } else {
+    heldT = tetrominos[currentTetromino]
+    tetrominos[currentTetromino] = tetrominos[currentTetromino + 1]
+    const r = Math.floor(Math.random() * 7)
+    tetrominos[currentTetromino + 1] = new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color)
+    tetrominos[currentTetromino + 1].displaySmall(nextCells)
+  }
+  heldT.remove()
+  heldT.x === 2 ? heldT.x = 4 : heldT.x = 3
+  heldT.y = 0 - heldT.width
+  heldT.displaySmall(holdCells)
+  
 }
 
 playGame()

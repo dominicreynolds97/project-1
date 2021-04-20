@@ -13,23 +13,42 @@
 
   </header>
   <main>
-    <div id=left-info">
-      <ul id="controls">
-        <li>⬅ - Move Left</li>
-        <li>➡ - Move Right</li>
-        <li>⬇ - Soft Fall</li>
-        <li>Space-bar - Hard Fall</li>
-        <li>X - Rotate Clockwise</li>
-        <li>Z - Rotate Anti-Clockwise</li>
-      </ul>
+    <div class="info">
+      <div>
+        <h3>Hold</h3>
+        <div class="small-display" id="hold-tetromino"></div>
+      </div>
+        <div id="controls">
+        <ul class="controls"><strong>CONTROLS</strong>
+          <li>Move Left</li>
+          <li>Move Right</li>
+          <li>Soft Fall</li>
+          <li>Hold</li>
+          <li>Rotate Clockwise</li>
+          <li>Rotate Anti-Clockwise</li>
+          <li>Hard Fall</li>
+        </ul>
+        <ul class="controls"> <strong>BUTTON</strong>
+          <li>Left</li>
+          <li>Right</li>
+          <li>Down</li>
+          <li>Up</li>
+          <li>X</li>
+          <li>Z</li>
+          <li>Space-bar</li>
+        </ul>
+      </div>
     </div>
     <div id="game-screen"></div>
-    <div id="right-info">
+    <div class="info">
       <div id=scores">
         <h2>High Score: <span id="high-score">0</span></h2>
         <h2>Score: <span id="score">0</span></h2>
       </div>
-      <div id="next-tetromino"></div>
+      <div>
+        <h3>Next</h3>
+        <div class="small-display" id="next-tetromino"></div>
+      </div>
       <h2>Level: <span id="level">0</span></h2>
     </div>
   </main>
