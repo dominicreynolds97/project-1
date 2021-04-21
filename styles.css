@@ -1,13 +1,13 @@
 * {
   box-sizing: border-box;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Metal Mania', cursive;
 }
 
 body {
   display:flex;
   flex-direction: column;
   align-items: center;
-  color:rgb(255, 255, 255)
+  color:rgb(255, 0, 0)
 }
 
 main {
@@ -16,8 +16,9 @@ main {
   justify-content: space-around;
   width: 900px;
   border: 3px solid black;
-  background-color: rgb(5, 0, 139);
+  background-color: rgb(0, 0, 0);
   padding: 20px;
+  box-shadow: inset 0 0 50px 50px rgb(4, 0, 132);
 }
 
 #game-screen {
@@ -26,7 +27,7 @@ main {
   flex-wrap: wrap;
   height: 600px;
   flex: 1;
-  border: 3px solid black;
+  border: 3px solid rgb(178, 0, 0);
   background-color: black;
 }
 
@@ -40,6 +41,7 @@ main {
   width: 25%;
   height: 25%;
   border: 0.5px solid black;
+
 }
 
 .info {
@@ -52,7 +54,7 @@ main {
 }
 
 .small-display {
-  border: 2px solid black;
+  border: 2px solid rgb(81, 81, 81);
   background-color: black;
   height: 120px;
   width: 120px;
@@ -68,12 +70,56 @@ main {
 }
 .controls li {
   list-style: none;
-  height: 3em;
-  border: 0.5px solid white;
+  white-space: nowrap;
+  font-size: 19px;
+  border: 0.5px solid rgb(81, 81, 81);;
 }
 ul {
   text-align: center;
-  border: 0.5px solid white;
+  border: 0.5px solid rgb(81, 81, 81);;
   flex: 1;
   padding: 0;
+}
+
+.overlay {
+  position: fixed;
+  align-items: center;
+  justify-content: center;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 2;
+}
+
+#high-scores-box {
+  border: 3px solid white;
+  background-color: black;
+  width: 350px;
+  height: 250px;
+  text-align: center;
+}
+/* 
+#high-scores-overlay {
+  display: none;
+}
+
+#enter-name-overlay {
+  display: none;
+} */
+
+#enter-name-box {
+  border: 3px solid white;
+  background-color: black;
+  width: 300px;
+  height: 150px;
+  text-align: center;
+}
+
+.new-game {
+  padding: 10px;
 }

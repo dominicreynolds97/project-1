@@ -5,6 +5,11 @@ const elements = {
   level: document.querySelector('#level'),
   next: document.querySelector('#next-tetromino'),
   hold: document.querySelector('#hold-tetromino'),
+  song: document.querySelector('#song'),
+  collision: document.querySelector('#collision'),
+  removeRow: document.querySelector('#remove-row'),
+  highScoresOverlay: document.querySelector('#high-scores-overlay'),
+  enterNameOverlay: document.querySelector('#enter-name-overlay'),
 }
 
 class Tetromino {
@@ -20,7 +25,7 @@ class Tetromino {
     this.shapeArray.forEach((shapeArray, i) => shapeArray.forEach((cell, j) => {
       if (cell && (this.y + i >= 0)) {
         cells[this.x + j][this.y + i].color = this.color
-        cells[this.x + j][this.y + i].element.style = `background-color: ${this.color}; box-shadow: inset 0 0 0px 1px darkgrey;`
+        cells[this.x + j][this.y + i].element.style = `background-color: ${this.color};`
       } else if (!(this.y + i > 19) && (this.y + i >= 0) && cells[this.x + j] && !cells[this.x + j][this.y + i].hasTetromino) {
         cells[this.x + j][this.y + i].element.style = 'background-color: black'
       }
@@ -30,12 +35,21 @@ class Tetromino {
   displaySmall(array) {
     for (let x = 0; x < 4; x++) {
       for (let y = 0; y < 4; y++) {
+        // if (this.width > 2) {
         if (x < this.width && y < this.width && this.shapeArray[x][y]) {
           array[x][y].color = this.color
-          array[x][y].element.style = `background-color: ${this.color}; box-shadow: inset 0 0 0px 1px darkgrey;`
+          array[x][y].element.style = `background-color: ${this.color};`
         } else {
           array[x][y].element.style = 'background-color: black'
         }
+        // } else {
+        //   if (x < this.width && y < this.width && this.shapeArray[x][y]) {
+        //     array[x + 1][y + 1].color = this.color
+        //     array[x + 1][y + 1].element.style = `background-color: ${this.color};`
+        //   } else {
+        //     array[x + 1][y + 1].element.style = 'background-color: black'
+        //   }
+        // }
       }
     }
   }
@@ -79,30 +93,32 @@ class Tetromino {
   }
 
   rotate(isClockwise) {
-    const newShape = []
-    for (let i = 0; i < this.width; i++) {
-      newShape.push([])
+    if (!pause) {
+      const newShape = []
+      for (let i = 0; i < this.width; i++) {
+        newShape.push([])
+      }
+      if (isClockwise) {
+        this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+          if (i + this.x >= 10) {
+            this.moveSideways(-1)
+          } else if (i + this.x <= 0) {
+            this.moveSideways(1)
+          }
+          newShape[j].unshift(this.shapeArray[i][j])
+        }))
+      } else {
+        this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+          if (cell && i + this.x >= 10) {
+            this.moveSideways(-1)
+          } else if (cell && i + this.x < 0) {
+            this.moveSideways(1)
+          }
+          newShape[this.width - 1 - j].push(this.shapeArray[i][j])
+        }))
+      }
+      this.shapeArray = newShape
     }
-    if (isClockwise) {
-      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
-        if (i + this.x >= 10) {
-          this.moveSideways(-1)
-        } else if (i + this.x <= 0) {
-          this.moveSideways(1)
-        }
-        newShape[j].unshift(this.shapeArray[i][j])
-      }))
-    } else {
-      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
-        if (cell && i + this.x >= 10) {
-          this.moveSideways(-1)
-        } else if (cell && i + this.x < 0) {
-          this.moveSideways(1)
-        }
-        newShape[this.width - 1 - j].push(this.shapeArray[i][j])
-      }))
-    }
-    this.shapeArray = newShape
   }
 
   collisionDetection() {
@@ -114,8 +130,9 @@ class Tetromino {
       }
     }))
     if (hasCollided) {
+      elements.collision.play()
       if (this.y < 0) {
-        this.gameOver()
+        gameOver()
       } else {
         updateScore(18)
       }
@@ -124,15 +141,6 @@ class Tetromino {
       }))
     }
     return hasCollided
-  }
-
-  gameOver() {
-    gameOver = true
-    if (checkHighScore()) {
-      alert(`You beat the high score!\nYou scored ${score} points`)
-    } else {
-      alert(`GAME OVER!\nYou scored ${score} points`)
-    }
   }
 
   remove() {
@@ -161,7 +169,7 @@ let level = 0
 let score = 0
 let highScore = localStorage.getItem('highScore')
 let linesCleared = 0
-let gameOver = false
+let isGameOver = false
 let r = Math.floor(Math.random() * 7)
 const r2 = Math.floor(Math.random() * 7)
 const tetrominos = [new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shapeArray, tetrominoChoices[r2].color)]
@@ -170,6 +178,9 @@ let speed = 750
 let softFall = false
 let hardFall = false
 let heldT
+let pause = false
+let sfxVolume = 1
+let songPlaying = true
 
 smallDisplay(elements.next, nextCells)
 smallDisplay(elements.hold, holdCells)
@@ -194,6 +205,8 @@ for (let x = 0; x < 10; x++) {
   }
   cells.push(tempArray)
 }
+elements.song.loop = true
+//elements.song.play()
 
 function smallDisplay(div, array) { 
   for (let x = 0; x < 4; x++) {
@@ -213,7 +226,7 @@ function smallDisplay(div, array) {
 }
 
 function playGame() {
-  if (!gameOver) {
+  if (!isGameOver && !pause) {
     const newTet = tetrominos[currentTetromino].drop()
     if (newTet) {
       r = Math.floor(Math.random() * 7)
@@ -236,27 +249,72 @@ function playGame() {
   }
 }
 
-
+//key Bindings
 document.addEventListener('keydown', e => {
   const key = e.key
-  if (key === 'x') {
-    tetrominos[currentTetromino].rotate(true)
-    tetrominos[currentTetromino].display()
-  } else if (key === 'z') {
-    tetrominos[currentTetromino].rotate(false)
-    tetrominos[currentTetromino].display()
-  } else if (key === 'ArrowLeft') {
-    tetrominos[currentTetromino].moveSideways(-1)
-    tetrominos[currentTetromino].display()
-  } else if (key === 'ArrowRight') {
-    tetrominos[currentTetromino].moveSideways(1)
-    tetrominos[currentTetromino].display()
-  } else if (key === 'ArrowDown') {
-    softFall = true
-  } else if (key === ' ') {
-    if (!hardFall) hardFall = true
-  } else if (key === 'ArrowUp') {
-    holdTetromino()
+  if (!isGameOver) {
+    if (key === 'x') {
+      tetrominos[currentTetromino].rotate(true)
+      tetrominos[currentTetromino].display()
+    } else if (key === 'z') {
+      tetrominos[currentTetromino].rotate(false)
+      tetrominos[currentTetromino].display()
+    } else if (key === 'ArrowLeft') {
+      tetrominos[currentTetromino].moveSideways(-1)
+      tetrominos[currentTetromino].display()
+    } else if (key === 'ArrowRight') {
+      tetrominos[currentTetromino].moveSideways(1)
+      tetrominos[currentTetromino].display()
+    } else if (key === 'ArrowDown') {
+      softFall = true
+    } else if (key === ' ') {
+      if (!hardFall) hardFall = true
+    } else if (key === 'ArrowUp') {
+      holdTetromino()
+    } else if (key === 'p') {
+      if (pause) {
+        pause = false
+        playGame()
+      } else {
+        pause = true
+      }
+    } else if (key === '<') {
+      
+      if (elements.song.volume > 0) {
+        elements.song.volume -= 0.05
+        if (elements.song.volume < 0.05) {
+          elements.song.volume = 0
+        }
+      }
+    } else if (key === '>') {
+      console.log(elements.song.volume)
+      if (elements.song.volume < 1) {
+        elements.song.volume += 0.05
+        if (elements.song.volume > 0.95) {
+          elements.song.volume = 1
+        }
+      }
+    } else if (key === ',') {
+      if (sfxVolume > 0) {
+        sfxVolume -= 0.1
+        elements.collision.volume = sfxVolume
+        elements.removeRow.volume = sfxVolume
+      }
+    } else if (key === '.') {
+      if (sfxVolume < 1) {
+        sfxVolume += 0.1
+        elements.collision.volume = sfxVolume
+        elements.removeRow.volume = sfxVolume
+      }
+    } else if (key === 'm') {
+      if (songPlaying) {
+        elements.song.pause()
+        songPlaying = false
+      } else {
+        elements.song.play()
+        songPlaying = true
+      }
+    }
   }
 })
 
@@ -288,6 +346,9 @@ function checkTetris() {
     case 3: updateScore(300); break
     case 4: updateScore(1200); break
   }
+  if (tetrisCount > 0) {
+    elements.removeRow.play()
+  }
   linesCleared += tetrisCount
   levelCheck()
 }
@@ -299,7 +360,7 @@ function removeRow(y) {
       cells[x][i].hasTetromino = tempCell.hasTetromino
       if (tempCell.hasTetromino) {
         cells[x][i].color = tempCell.color
-        cells[x][i].element.style = `background-color: ${tempCell.color}; box-shadow: inset 0 0 0px 1px darkgrey;`
+        cells[x][i].element.style = `background-color: ${tempCell.color};`
       } else {
         cells[x][i].color = 'black'
         cells[x][i].element.style = 'background-color: black'
@@ -321,15 +382,15 @@ function levelCheck() {
   }
 }
 
-function checkHighScore() {
-  if (score > highScore) {
-    highScore = score
-    localStorage.setItem('highScore', highScore)
-    elements.highScore.innerHTML = highScore
-    return true
-  }
-  return false
-}
+// function checkHighScore() {
+//   if (score > highScore) {
+//     highScore = score
+//     localStorage.setItem('highScore', highScore)
+//     elements.highScore.innerHTML = highScore
+//     return true
+//   }
+//   return false
+// }
 
 function holdTetromino() {
   if (heldT) {
@@ -350,5 +411,12 @@ function holdTetromino() {
   heldT.displaySmall(holdCells)
   
 }
+
+function gameOver() {
+  isGameOver = true
+  console.log('Game Over')
+  elements.enterNameOverlay.style.display = 'flex'
+}
+
 
 playGame()

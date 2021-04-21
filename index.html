@@ -7,12 +7,41 @@
   <title>Tetris</title>
   <link rel="stylesheet" href="styles.css">
   <script defer src="tetris.js"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap" rel="stylesheet">
 </head>
 <body>
+  <audio id="song" loop>
+    <source src="Tetris.wav">
+  </audio>
+  <audio src="collision.wav" id="collision"></audio>
+  <audio src="remove-row.wav" id="remove-row"></audio>
   <header>
 
   </header>
   <main>
+    <div id="high-scores-overlay" class="overlay">
+      <div id="high-scores-box">
+        <h2>High Scores</h2>
+        <ol id="high-scores">
+          <li id="1"></li>
+          <li id="2"></li>
+          <li id="3"></li>
+          <li id="4"></li>
+          <li id="5"></li>
+        </ol>
+        <button class="new-game">New Game</button>
+      </div>
+    </div>
+    <div id="enter-name-overlay" class="overlay">
+      <div id="enter-name-box">
+        <form>
+          <h2>Enter Your Name</h2>
+          <input id="name">
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
     <div class="info">
       <div>
         <h3>Hold</h3>
@@ -27,6 +56,10 @@
           <li>Rotate Clockwise</li>
           <li>Rotate Anti-Clockwise</li>
           <li>Hard Fall</li>
+          <li>Pause</li>
+          <li>Music Volume</li>
+          <li>SFX Volume</li>
+          <li>Pause/Play Music</li>
         </ul>
         <ul class="controls"> <strong>BUTTON</strong>
           <li>Left</li>
@@ -36,6 +69,10 @@
           <li>X</li>
           <li>Z</li>
           <li>Space-bar</li>
+          <li>P</li>
+          <li><    ></li>
+          <li>,    .</li>
+          <li>M</li>
         </ul>
       </div>
     </div>
