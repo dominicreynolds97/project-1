@@ -49,21 +49,12 @@ class Tetromino {
   displaySmall(array) {
     for (let x = 0; x < 4; x++) {
       for (let y = 0; y < 4; y++) {
-        // if (this.width > 2) {
         if (x < this.width && y < this.width && this.shapeArray[x][y]) {
           array[x][y].color = this.color
           array[x][y].element.style = `background-color: ${this.color};`
         } else {
           array[x][y].element.style = 'background-color: black'
         }
-        // } else {
-        //   if (x < this.width && y < this.width && this.shapeArray[x][y]) {
-        //     array[x + 1][y + 1].color = this.color
-        //     array[x + 1][y + 1].element.style = `background-color: ${this.color};`
-        //   } else {
-        //     array[x + 1][y + 1].element.style = 'background-color: black'
-        //   }
-        // }
       }
     }
   }
@@ -83,7 +74,7 @@ class Tetromino {
     this.display()
     return false
   }
-
+  //Moves Tetromino left or right is possible
   moveSideways(direction) {
     let canMove = true
     this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
@@ -107,7 +98,7 @@ class Tetromino {
       this.display()
     }
   }
-
+  //rotates the tetromino if possible
   rotate(isClockwise) {
     const newShape = []
     let canRotate = true
@@ -141,7 +132,7 @@ class Tetromino {
       this.shapeArray = newShape
     }
   }
-
+  //Checks for a collision
   collisionDetection() {
     let hasCollided = false
     this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
@@ -164,6 +155,7 @@ class Tetromino {
     return hasCollided
   }
 
+  //removes the tetromino from view
   remove() {
     this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
       if (cell && cells[this.x + j][this.y + i]) {
@@ -417,6 +409,49 @@ function gameOver() {
   elements.song.pause()
 }
 
+
+
+//resets and/or starts a new game
+function newGame() {
+  level = 0
+  score = 0
+  highScores = JSON.parse(localStorage.getItem('highScores')) || []
+  highScore
+  linesCleared = 0
+  isGameOver = false
+  isPaused = false
+  r = Math.floor(Math.random() * 7)
+  r2 = Math.floor(Math.random() * 7)
+  tetrominos = [new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shapeArray, tetrominoChoices[r2].color)]
+  currentTetromino = 0
+  speed = 750
+  softFall = false
+  hardFall = false
+  heldT = undefined
+  songPlaying = elements.musicOnOff.checked
+  elements.score.innerHTML = score 
+  elements.linesCleared.innerHTML = linesCleared
+  if (songPlaying) {
+    elements.song.play()
+  }
+
+  cells.forEach((xCells) => xCells.forEach((cell) => {
+    cell.hasTetromino = false
+    cell.element.style = 'background-color: black'
+    cell.color = 'black'
+  }))
+  nextCells.forEach((xCells) => xCells.forEach(cell => {
+    cell.element.style = 'background-color: black'
+    cell.color = 'black'
+  }))
+  holdCells.forEach(xCells => xCells.forEach(cell => {
+    cell.element.style = 'background-color: black'
+    cell.color = 'black'
+  }))
+  playGame()
+}
+
+//All event listeners
 elements.enterNameForm.onsubmit = (event) => {
   event.preventDefault()
   addNewScore(elements.enterNameInput.value)
@@ -467,42 +502,3 @@ elements.exitSettingButton.addEventListener('click', () => {
     elements.pauseOverlay.style.display = 'flex'
   }
 })
-
-function newGame() {
-  level = 0
-  score = 0
-  highScores = JSON.parse(localStorage.getItem('highScores')) || []
-  highScore
-  linesCleared = 0
-  isGameOver = false
-  isPaused = false
-  r = Math.floor(Math.random() * 7)
-  r2 = Math.floor(Math.random() * 7)
-  tetrominos = [new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shapeArray, tetrominoChoices[r2].color)]
-  currentTetromino = 0
-  speed = 750
-  softFall = false
-  hardFall = false
-  heldT = undefined
-  songPlaying = elements.musicOnOff.checked
-  elements.score.innerHTML = score 
-  elements.linesCleared.innerHTML = linesCleared
-  if (songPlaying) {
-    elements.song.play()
-  }
-
-  cells.forEach((xCells) => xCells.forEach((cell) => {
-    cell.hasTetromino = false
-    cell.element.style = 'background-color: black'
-    cell.color = 'black'
-  }))
-  nextCells.forEach((xCells) => xCells.forEach(cell => {
-    cell.element.style = 'background-color: black'
-    cell.color = 'black'
-  }))
-  holdCells.forEach(xCells => xCells.forEach(cell => {
-    cell.element.style = 'background-color: black'
-    cell.color = 'black'
-  }))
-  playGame()
-}
