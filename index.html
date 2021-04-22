@@ -12,23 +12,42 @@
 </head>
 <body>
   <audio id="song" loop>
-    <source src="Tetris.wav">
+    <source src="/audio/Tetris.wav">
   </audio>
-  <audio src="collision.wav" id="collision"></audio>
-  <audio src="remove-row.wav" id="remove-row"></audio>
+  <audio src="/audio/collision.wav" id="collision"></audio>
+  <audio src="/audio/remove-row.wav" id="remove-row"></audio>
   <header>
 
   </header>
   <main>
+    <div id="main-menu-overlay" class="overlay">
+      <div id="main-menu">
+        <h1>Heavy Metal Tetris</h1>
+        <button class="new-game">Play</button>
+        <button class="settings-button">Settings</button>
+      </div>
+    </div>
+    <div id="settings-overlay" class="overlay">
+      <div id="settings-box">
+        <h2>Settings</h2>
+        <p>Music on/off</p>
+        <input type="checkbox" id="music-on-off" checked="true">
+        <p>Music volume</p>
+        <input id="music-volume" type="range" min="0" max="1" value="1" step="0.05">
+        <p>SFX volume</p>
+        <input id="sfx-volume" type="range" min="0" max="1" value="1" step="0.05">
+        <button id="exit-settings">Exit</button>
+      </div>
+    </div>
     <div id="high-scores-overlay" class="overlay">
       <div id="high-scores-box">
         <h2>High Scores</h2>
         <ol id="high-scores">
-          <li id="1"></li>
-          <li id="2"></li>
-          <li id="3"></li>
-          <li id="4"></li>
-          <li id="5"></li>
+          <li id="1"><span>1. </span><span class="left-item"></span><span class="right-item"></span></li>
+          <li id="2"><span>2. </span><span class="left-item"></span><span class="right-item"></span></li>
+          <li id="3"><span>3. </span><span class="left-item"></span><span class="right-item"></span></li>
+          <li id="4"><span>4. </span><span class="left-item"></span><span class="right-item"></span></li>
+          <li id="5"><span>5. </span><span class="left-item"></span><span class="right-item"></span></li>
         </ol>
         <button class="new-game">New Game</button>
       </div>
@@ -37,9 +56,18 @@
       <div id="enter-name-box">
         <form>
           <h2>Enter Your Name</h2>
-          <input id="name">
+          <input id="name" maxlength="7">
           <button type="submit">Submit</button>
         </form>
+      </div>
+    </div>
+    <div id="pause-overlay" class="overlay">
+      <div id="pause-box">
+        <h1>Game Paused</h1>
+        <button id="main-menu-button">Main Menu</button>
+        <button class="settings-button">Settings</button>
+        <p>Press P to resume</p>
+        <p>Game and music by Dominic Reynolds</p>
       </div>
     </div>
     <div class="info">
@@ -57,9 +85,6 @@
           <li>Rotate Anti-Clockwise</li>
           <li>Hard Fall</li>
           <li>Pause</li>
-          <li>Music Volume</li>
-          <li>SFX Volume</li>
-          <li>Pause/Play Music</li>
         </ul>
         <ul class="controls"> <strong>BUTTON</strong>
           <li>Left</li>
@@ -70,9 +95,6 @@
           <li>Z</li>
           <li>Space-bar</li>
           <li>P</li>
-          <li><    ></li>
-          <li>,    .</li>
-          <li>M</li>
         </ul>
       </div>
     </div>
@@ -81,6 +103,7 @@
       <div id=scores">
         <h2>High Score: <span id="high-score">0</span></h2>
         <h2>Score: <span id="score">0</span></h2>
+        <h2>Lines cleared: <span id="lines-cleared">0</span></h2>
       </div>
       <div>
         <h3>Next</h3>
