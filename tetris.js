@@ -199,7 +199,7 @@ let songPlaying = true
 smallDisplay(elements.next, nextCells)
 smallDisplay(elements.hold, holdCells)
 
-if (highScores[0].score) {
+if (highScores[0].score !== undefined) {
   highScore = highScores[0].score
 } else {
   highScore = 0
