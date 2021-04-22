@@ -180,8 +180,8 @@ const nextCells = []
 const holdCells = []
 let level = 0
 let score = 0
-let highScores = JSON.parse(localStorage.getItem('highScores')) || []
-let highScore
+let highScores = JSON.parse(localStorage.getItem('highScores')) || [{ name: '', score: 0 }]
+let highScore = highScores[0].score
 let linesCleared = 0
 let isGameOver = false
 let r = Math.floor(Math.random() * 7)
@@ -199,11 +199,6 @@ let songPlaying = true
 smallDisplay(elements.next, nextCells)
 smallDisplay(elements.hold, holdCells)
 
-if (highScores !== []) {
-  highScore = highScores[0].score
-} else {
-  highScore = 0
-}
 elements.highScore.innerHTML = highScore
 
 for (let x = 0; x < 10; x++) {
@@ -373,10 +368,6 @@ function addNewScore(name) {
   localStorage.setItem('highScores', JSON.stringify(highScores))
   for (let i = 0; i < 5; i++) {
     if (highScores[i]) {
-      let whiteSpace = ' '
-      for (let j = 0; j < (20 - highScores[i].length); j++) {
-        whiteSpace = whiteSpace + ' '
-      }
       const element = document.getElementById(i + 1).children
       element[1].innerHTML = highScores[i].name
       element[2].innerHTML = highScores[i].score
