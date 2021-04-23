@@ -197,9 +197,10 @@ function newGame() {
   gameData.level = 0
   gameData.score = 0
   if (localStorage) {
-    gameData.highScores = JSON.parse(localStorage.getItem('highScores')) || []
+    gameData.highScores = JSON.parse(localStorage.getItem('highScores')) ?? []
   } 
-  gameData.highScore = gameData.highScores[0] || 0
+  console.log(gameData.highScores[0].score)
+  gameData.highScore = gameData.highScores[0].score ?? 0
   gameData.linesCleared = 0
   gameData.isGameOver = false
   gameData.isPaused = false
@@ -212,6 +213,7 @@ function newGame() {
   gameData.hardFall = false
   gameData.heldT = undefined
   gameData.songPlaying = elements.musicOnOff.checked
+  elements.highScore.innerHTML = gameData.highScore
   elements.score.innerHTML = gameData.score 
   elements.linesCleared.innerHTML = gameData.linesCleared
   atMainMenu = false
