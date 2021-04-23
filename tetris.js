@@ -36,14 +36,14 @@ class Tetromino {
   }
   //Display Tetrimino on game screen
   display() {
-    this.shapeArray.forEach((shapeArray, i) => shapeArray.forEach((cell, j) => {
+    this.shapeArray.nestedForEach((cell, i, j) => {
       if (cell && (this.y + i >= 0)) {
         cells[this.x + j][this.y + i].color = this.color
         cells[this.x + j][this.y + i].element.style = `background-color: ${this.color};`
       } else if (!(this.y + i > 19) && (this.y + i >= 0) && cells[this.x + j] && !cells[this.x + j][this.y + i].hasTetromino) {
         cells[this.x + j][this.y + i].element.style = 'background-color: black'
       }
-    }))
+    })
   }
   //Display Tetrimino for either next or hold 
   displaySmall(array) {
@@ -63,13 +63,13 @@ class Tetromino {
     if (this.collisionDetection()) {
       return true
     }
-    this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+    this.shapeArray.nestedForEach((cell, i, j) => {
       if (!cell && (this.x + j > 9 || this.x + j < 0)) {
         //console.log(cells[this.x + j])
       } else if ((this.y + i >= 0) && !cells[this.x + j][this.y + i].hasTetromino) {
         cells[this.x + j][this.y + i].element.style = 'background-color: black'
       }
-    }))
+    })
     this.y++
     this.display()
     return false
@@ -77,7 +77,7 @@ class Tetromino {
   //Moves Tetromino left or right is possible
   moveSideways(direction) {
     let canMove = true
-    this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+    this.shapeArray.nestedForEach((cell, i, j) => {
       if (cell && (this.y + i > 0 && !cells[this.x + j + direction] || 
         (!cells[this.x + j + direction][this.y + i] || 
           cells[this.x + j + direction][this.y + i].hasTetromino) )) {
@@ -86,14 +86,14 @@ class Tetromino {
       if (cell && this.y + i < 0) {
         canMove = true
       }
-    }))
+    })
     
     if (canMove) {
-      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+      this.shapeArray.nestedForEach((cell, i, j) => {
         if (this.y + i >= 0 && cell && cells[this.x + j] && !cells[this.x + j][this.y + i].hasTetromino) {
           cells[this.x + j][this.y + i].element.style = 'background-color: black'
         }
-      }))
+      })
       this.x += direction
       this.display()
     }
@@ -106,7 +106,7 @@ class Tetromino {
       newShape.push([])
     }
     if (isClockwise) {
-      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+      this.shapeArray.nestedForEach((cell, i, j) => {
         if (cell && j + this.y >= 19 || (this.y + (this.width - 1 - i) > 0 && cells[this.x + j] && cells[this.x + j][this.y + (this.width - 1 - i)].hasTetromino)) {
           canRotate = false
         } else if (cell && i + this.x >= 10) {
@@ -115,9 +115,9 @@ class Tetromino {
           this.moveSideways(1)
         }
         newShape[j].unshift(this.shapeArray[i][j])
-      }))
+      })
     } else {
-      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+      this.shapeArray.nestedForEach((cell, i, j) => {
         if (cell && j + this.y >= 19 || (this.y + i > 0 && cells[this.width - 1 - j + this.x] && cells[this.width - 1 - j + this.x][this.y + i].hasTetromino)) {
           canRotate = false
         } else if (cell && i + this.x >= 10) {
@@ -126,7 +126,7 @@ class Tetromino {
           this.moveSideways(1)
         }
         newShape[this.width - 1 - j].push(this.shapeArray[i][j])
-      }))
+      })
     }
     if (canRotate) {
       this.shapeArray = newShape
@@ -135,12 +135,12 @@ class Tetromino {
   //Checks for a collision
   collisionDetection() {
     let hasCollided = false
-    this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+    this.shapeArray.nestedForEach((cell, i, j) => {
       if (!(!cell || this.y + i < 0) && (cell === true && (this.y + i === 19 || cells[this.x + j][this.y + i + 1].hasTetromino))) {
         hasCollided = true 
-        hardFall = false
+        gameData.hardFall = false
       }
-    }))
+    })
     if (hasCollided) {
       elements.collision.play()
       if (this.y < 0) {
@@ -148,21 +148,28 @@ class Tetromino {
       } else {
         updateScore(18)
       }
-      this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+      this.shapeArray.nestedForEach((cell, i, j) => {
         if (cell) cells[this.x + j][this.y + i].hasTetromino = true
-      }))
+      })
     }
     return hasCollided
   }
 
   //removes the tetromino from view
   remove() {
-    this.shapeArray.forEach((xCells, i) => xCells.forEach((cell, j) => {
+    this.shapeArray.nestedForEach((cell, i, j) => {
       if (cell && cells[this.x + j][this.y + i]) {
         cells[this.x + j][this.y + i].element.style = 'background-color: black'
       }
-    }))
+    })
   }
+}
+
+//Array callback function - A double forEach loop for nested arrays
+Array.prototype.nestedForEach = function(callback) {
+  this.forEach((e, i) => e.forEach((e2, j) => {
+    return callback(this[i][j], i, j)
+  }))
 }
 
 const tetrominoChoices = [
@@ -178,28 +185,55 @@ const tetrominoChoices = [
 const cells = []
 const nextCells = []
 const holdCells = []
-let level = 0
-let score = 0
-let highScores = JSON.parse(localStorage.getItem('highScores')) || [{ name: '', score: 0 }]
-let highScore = highScores[0].score
-let linesCleared = 0
-let isGameOver = false
-let r = Math.floor(Math.random() * 7)
-let r2 = Math.floor(Math.random() * 7)
-let tetrominos = [new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shapeArray, tetrominoChoices[r2].color)]
-let currentTetromino = 0
-let speed = 750
-let softFall = false
-let hardFall = false
-let heldT
-let isPaused = false
-let songPlaying = true
-
+const gameData = {}
+let atMainMenu = true
+elements.song.loop = true
 
 smallDisplay(elements.next, nextCells)
 smallDisplay(elements.hold, holdCells)
 
-elements.highScore.innerHTML = highScore
+//resets and/or starts a new game
+function newGame() {
+  gameData.level = 0
+  gameData.score = 0
+  if (localStorage) {
+    gameData.highScores = JSON.parse(localStorage.getItem('highScores')) || []
+  } 
+  gameData.highScore = gameData.highScores[0] || 0
+  gameData.linesCleared = 0
+  gameData.isGameOver = false
+  gameData.isPaused = false
+  gameData.r = Math.floor(Math.random() * 7)
+  const r2 = Math.floor(Math.random() * 7)
+  gameData.tetrominos = [new Tetromino(tetrominoChoices[gameData.r].shapeArray, tetrominoChoices[gameData.r].color), new Tetromino(tetrominoChoices[r2].shapeArray, tetrominoChoices[r2].color)]
+  gameData.currentTetromino = 0
+  gameData.speed = 750
+  gameData.softFall = false
+  gameData.hardFall = false
+  gameData.heldT = undefined
+  gameData.songPlaying = elements.musicOnOff.checked
+  elements.score.innerHTML = gameData.score 
+  elements.linesCleared.innerHTML = gameData.linesCleared
+  atMainMenu = false
+  if (gameData.songPlaying) {
+    elements.song.play()
+  }
+
+  cells.nestedForEach(cell => {
+    cell.hasTetromino = false
+    cell.element.style = 'background-color: black'
+    cell.color = 'black'
+  })
+  nextCells.nestedForEach(cell => {
+    cell.element.style = 'background-color: black'
+    cell.color = 'black'
+  })
+  holdCells.nestedForEach(cell => {
+    cell.element.style = 'background-color: black'
+    cell.color = 'black'
+  })
+  playGame()
+}
 
 for (let x = 0; x < 10; x++) {
   const tempArray = []
@@ -216,7 +250,6 @@ for (let x = 0; x < 10; x++) {
   }
   cells.push(tempArray)
 }
-elements.song.loop = true
 
 function smallDisplay(div, array) { 
   for (let x = 0; x < 4; x++) {
@@ -236,25 +269,25 @@ function smallDisplay(div, array) {
 }
 
 function playGame() {
-  if (!isGameOver && !isPaused) {
-    const newTet = tetrominos[currentTetromino].drop()
+  if (!gameData.isGameOver && !gameData.isPaused) {
+    const newTet = gameData.tetrominos[gameData.currentTetromino].drop()
     if (newTet) {
-      r = Math.floor(Math.random() * 7)
-      tetrominos.push(new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color))
+      gameData.r = Math.floor(Math.random() * 7)
+      gameData.tetrominos.push(new Tetromino(tetrominoChoices[gameData.r].shapeArray, tetrominoChoices[gameData.r].color))
       checkTetris()
-      currentTetromino++
+      gameData.currentTetromino++
     }
-    tetrominos[currentTetromino + 1].displaySmall(nextCells)
-    if (hardFall) {
+    gameData.tetrominos[gameData.currentTetromino + 1].displaySmall(nextCells)
+    if (gameData.hardFall) {
       playGame() 
-    } else if (softFall) {
+    } else if (gameData.softFall) {
       setTimeout(() => {
         playGame()
       }, 50) 
     } else {
       setTimeout(() => {
         playGame()
-      }, speed) 
+      }, gameData.speed) 
     }
   }
 }
@@ -262,43 +295,43 @@ function playGame() {
 //key Bindings
 document.addEventListener('keydown', e => {
   const key = e.key
-  if (!isGameOver && !isPaused) {
+  if (!gameData.isGameOver && !gameData.isPaused) {
     if (key === 'x') {
-      tetrominos[currentTetromino].rotate(true)
-      tetrominos[currentTetromino].display()
+      gameData.tetrominos[gameData.currentTetromino].rotate(true)
+      gameData.tetrominos[gameData.currentTetromino].display()
     } else if (key === 'z') {
-      tetrominos[currentTetromino].rotate(false)
-      tetrominos[currentTetromino].display()
+      gameData.tetrominos[gameData.currentTetromino].rotate(false)
+      gameData.tetrominos[gameData.currentTetromino].display()
     } else if (key === 'ArrowLeft') {
-      tetrominos[currentTetromino].moveSideways(-1)
-      tetrominos[currentTetromino].display()
+      gameData.tetrominos[gameData.currentTetromino].moveSideways(-1)
+      gameData.tetrominos[gameData.currentTetromino].display()
     } else if (key === 'ArrowRight') {
-      tetrominos[currentTetromino].moveSideways(1)
-      tetrominos[currentTetromino].display()
+      gameData.tetrominos[gameData.currentTetromino].moveSideways(1)
+      gameData.tetrominos[gameData.currentTetromino].display()
     } else if (key === 'ArrowDown') {
-      softFall = true
+      gameData.softFall = true
     } else if (key === ' ') {
-      if (!hardFall) hardFall = true
+      if (!gameData.hardFall) gameData.hardFall = true
     } else if (key === 'ArrowUp') {
       holdTetromino()
     }
   }
   if (key === 'p') {
-    if (isPaused) {
-      isPaused = false
+    if (gameData.isPaused || atMainMenu) {
+      gameData.isPaused = false
       elements.pauseOverlay.style.display = 'none'
       elements.settingsOverlay.style.display = 'none'
       playGame()
     } else {
       elements.pauseOverlay.style.display = 'flex'
-      isPaused = true
+      gameData.isPaused = true
     }
   } 
 })
 
 document.addEventListener('keyup', e => {
   if (e.key === 'ArrowDown') {
-    softFall = false
+    gameData.softFall = false
   } 
 })
 
@@ -327,8 +360,8 @@ function checkTetris() {
   if (tetrisCount > 0) {
     elements.removeRow.play()
   }
-  linesCleared += tetrisCount
-  elements.linesCleared.innerHTML = linesCleared
+  gameData.linesCleared += tetrisCount
+  elements.linesCleared.innerHTML = gameData.linesCleared
   levelCheck()
 }
 
@@ -349,98 +382,56 @@ function removeRow(y) {
 }
 
 function updateScore(points) {
-  score += (level + 1) * points
-  elements.score.innerHTML = score
+  gameData.score += (gameData.level + 1) * points
+  elements.score.innerHTML = gameData.score
 }
 
 function levelCheck() {
-  if (linesCleared >= ((level + 1) * 10)) {
-    level++
-    elements.level.innerHTML = level
-    speed *= 0.8
+  if (gameData.linesCleared >= ((gameData.level + 1) * 10)) {
+    gameData.level++
+    elements.level.innerHTML = gameData.level
+    gameData.speed *= 0.8
   }
 }
 
 function addNewScore(name) {
-  const newScore = { name: name, score: score }
-  highScores.push(newScore)
-  highScores.sort((a, b) => b.score - a.score)
-  localStorage.setItem('highScores', JSON.stringify(highScores))
-  for (let i = 0; i < 5; i++) {
-    if (highScores[i]) {
-      const element = document.getElementById(i + 1).children
-      element[1].innerHTML = highScores[i].name
-      element[2].innerHTML = highScores[i].score
-    }
+  const newScore = { name: name, score: gameData.score }
+  gameData.highScores.push(newScore)
+  gameData.highScores.sort((playerA, playerB) => playerB.score - playerA.score)
+  if (localStorage) {
+    localStorage.setItem('highScores', JSON.stringify(gameData.highScores))
   }
+  const output = gameData.highScores.map((player, i) => {
+    if (i < 5) return `<li>${i + 1}.<span>${player.name}</span><span>${player.score}</span></li>`
+  })
+  elements.highScoresList.innerHTML = output.join('')
 }
 
 function holdTetromino() {
-  if (heldT) {
-    const tempT = tetrominos[currentTetromino]
-    tetrominos[currentTetromino] = heldT
-    heldT = tempT
+  if (gameData.heldT) {
+    const tempT = gameData.tetrominos[gameData.currentTetromino]
+    gameData.tetrominos[gameData.currentTetromino] = gameData.heldT
+    gameData.heldT = tempT
   } else {
-    heldT = tetrominos[currentTetromino]
-    tetrominos[currentTetromino] = tetrominos[currentTetromino + 1]
+    gameData.heldT = gameData.tetrominos[gameData.currentTetromino]
+    gameData.tetrominos[gameData.currentTetromino] = gameData.tetrominos[gameData.currentTetromino + 1]
     const r = Math.floor(Math.random() * 7)
-    tetrominos[currentTetromino + 1] = new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color)
-    tetrominos[currentTetromino + 1].displaySmall(nextCells)
+    gameData.tetrominos[gameData.currentTetromino + 1] = new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color)
+    gameData.tetrominos[gameData.currentTetromino + 1].displaySmall(nextCells)
   }
-  heldT.remove()
-  heldT.x === 2 ? heldT.x = 4 : heldT.x = 3
-  heldT.y = 0 - heldT.width
-  heldT.displaySmall(holdCells)
+  gameData.heldT.remove()
+  gameData.heldT.x === 2 ? gameData.heldT.x = 4 : gameData.heldT.x = 3
+  gameData.heldT.y = 0 - gameData.heldT.width
+  gameData.heldT.displaySmall(holdCells)
   
 }
 
 function gameOver() {
-  isGameOver = true
+  gameData.isGameOver = true
   elements.enterNameOverlay.style.display = 'flex'
   elements.song.pause()
 }
 
-
-
-//resets and/or starts a new game
-function newGame() {
-  level = 0
-  score = 0
-  highScores = JSON.parse(localStorage.getItem('highScores')) || []
-  highScore
-  linesCleared = 0
-  isGameOver = false
-  isPaused = false
-  r = Math.floor(Math.random() * 7)
-  r2 = Math.floor(Math.random() * 7)
-  tetrominos = [new Tetromino(tetrominoChoices[r].shapeArray, tetrominoChoices[r].color), new Tetromino(tetrominoChoices[r2].shapeArray, tetrominoChoices[r2].color)]
-  currentTetromino = 0
-  speed = 750
-  softFall = false
-  hardFall = false
-  heldT = undefined
-  songPlaying = elements.musicOnOff.checked
-  elements.score.innerHTML = score 
-  elements.linesCleared.innerHTML = linesCleared
-  if (songPlaying) {
-    elements.song.play()
-  }
-
-  cells.forEach((xCells) => xCells.forEach((cell) => {
-    cell.hasTetromino = false
-    cell.element.style = 'background-color: black'
-    cell.color = 'black'
-  }))
-  nextCells.forEach((xCells) => xCells.forEach(cell => {
-    cell.element.style = 'background-color: black'
-    cell.color = 'black'
-  }))
-  holdCells.forEach(xCells => xCells.forEach(cell => {
-    cell.element.style = 'background-color: black'
-    cell.color = 'black'
-  }))
-  playGame()
-}
 
 //All event listeners
 elements.enterNameForm.onsubmit = (event) => {
@@ -460,11 +451,11 @@ elements.mainMenuButton.addEventListener('click', () => {
   elements.pauseOverlay.style.display = 'none'
   elements.mainMenuOverlay.style.display = 'flex'
   elements.song.pause()
-  isPaused = false
+  gameData.isPaused = false
+  atMainMenu = true
 })
 
 elements.settingsButtons.forEach(e => e.addEventListener('click', () => {
-  console.log('clicked')
   elements.settingsOverlay.style.display = 'flex'
   elements.pauseOverlay.style.display = 'none'
 }))
@@ -479,8 +470,8 @@ elements.sfxVolume.addEventListener('change', () => {
 })
 
 elements.musicOnOff.addEventListener('change', () => {
-  songPlaying = elements.musicOnOff.checked
-  if (songPlaying) {
+  gameData.songPlaying = elements.musicOnOff.checked
+  if (gameData.songPlaying) {
     elements.song.play()
   } else {
     elements.song.pause()
@@ -489,7 +480,7 @@ elements.musicOnOff.addEventListener('change', () => {
 
 elements.exitSettingButton.addEventListener('click', () => {
   elements.settingsOverlay.style.display = 'none'
-  if (isPaused) {
+  if (gameData.isPaused) {
     elements.pauseOverlay.style.display = 'flex'
   }
 })

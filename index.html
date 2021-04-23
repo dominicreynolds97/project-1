@@ -11,65 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap" rel="stylesheet">
 </head>
 <body>
-  <audio id="song" loop>
-    <source src="./audio/Tetris.wav">
-  </audio>
+  <audio src="./audio/Tetris.wav"id="song"></audio>
   <audio src="./audio/collision.wav" id="collision"></audio>
   <audio src="./audio/remove-row.wav" id="remove-row"></audio>
-  <header>
-
-  </header>
   <main>
-    <div id="main-menu-overlay" class="overlay">
-      <div id="main-menu">
-        <h1>Heavy Metal Tetris</h1>
-        <button class="new-game">Play</button>
-        <button class="settings-button">Settings</button>
-      </div>
-    </div>
-    <div id="settings-overlay" class="overlay">
-      <div id="settings-box">
-        <h2>Settings</h2>
-        <p>Music on/off</p>
-        <input type="checkbox" id="music-on-off" checked="true">
-        <p>Music volume</p>
-        <input id="music-volume" type="range" min="0" max="1" value="1" step="0.05">
-        <p>SFX volume</p>
-        <input id="sfx-volume" type="range" min="0" max="1" value="1" step="0.05">
-        <button id="exit-settings">Exit</button>
-      </div>
-    </div>
-    <div id="high-scores-overlay" class="overlay">
-      <div id="high-scores-box">
-        <h2>High Scores</h2>
-        <ol id="high-scores">
-          <li id="1"><span>1. </span><span class="left-item"></span><span class="right-item"></span></li>
-          <li id="2"><span>2. </span><span class="left-item"></span><span class="right-item"></span></li>
-          <li id="3"><span>3. </span><span class="left-item"></span><span class="right-item"></span></li>
-          <li id="4"><span>4. </span><span class="left-item"></span><span class="right-item"></span></li>
-          <li id="5"><span>5. </span><span class="left-item"></span><span class="right-item"></span></li>
-        </ol>
-        <button class="new-game">New Game</button>
-      </div>
-    </div>
-    <div id="enter-name-overlay" class="overlay">
-      <div id="enter-name-box">
-        <form>
-          <h2>Enter Your Name</h2>
-          <input id="name" maxlength="7">
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    </div>
-    <div id="pause-overlay" class="overlay">
-      <div id="pause-box">
-        <h1>Game Paused</h1>
-        <button id="main-menu-button">Main Menu</button>
-        <button class="settings-button">Settings</button>
-        <p>Press P to resume</p>
-        <p>Game and music by Dominic Reynolds</p>
-      </div>
-    </div>
     <div class="info">
       <div>
         <h3>Hold</h3>
@@ -110,6 +55,50 @@
         <div class="small-display" id="next-tetromino"></div>
       </div>
       <h2>Level: <span id="level">0</span></h2>
+    </div>
+    <div id="main-menu-overlay" class="overlay">
+      <div id="main-menu">
+        <h1>Heavy Metal Tetris</h1>
+        <button class="new-game">Play</button>
+        <button class="settings-button">Settings</button>
+      </div>
+    </div>
+    <div id="settings-overlay" class="overlay">
+      <div id="settings-box">
+        <h2>Settings</h2>
+        <p>Music on/off</p>
+        <input type="checkbox" id="music-on-off" checked="true">
+        <p>Music volume</p>
+        <input id="music-volume" type="range" min="0" max="1" value="1" step="0.05">
+        <p>SFX volume</p>
+        <input id="sfx-volume" type="range" min="0" max="1" value="1" step="0.05">
+        <button id="exit-settings">Exit</button>
+      </div>
+    </div>
+    <div id="high-scores-overlay" class="overlay">
+      <div id="high-scores-box">
+        <h2>High Scores</h2>
+        <ol id="high-scores"></ol>
+        <button class="new-game">New Game</button>
+      </div>
+    </div>
+    <div id="enter-name-overlay" class="overlay">
+      <div id="enter-name-box">
+        <form>
+          <h2>Enter Your Name</h2>
+          <input id="name" maxlength="7">
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+    <div id="pause-overlay" class="overlay">
+      <div id="pause-box">
+        <h1>Game Paused</h1>
+        <button id="main-menu-button">Main Menu</button>
+        <button class="settings-button">Settings</button>
+        <p>Press P to resume</p>
+        <p>Game and music by Dominic Reynolds</p>
+      </div>
     </div>
   </main>
 </body>
