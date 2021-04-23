@@ -179,7 +179,7 @@ const tetrominoChoices = [
   { shapeArray: [[false, false, false], [true, true, false], [false, true, true]], color: '#ff0000' },
   { shapeArray: [[false, false, false], [false, true, true], [true, true, false]], color: '#ff9900' },
   { shapeArray: [[false, false, false, false], [false, false, false, false], [true, true, true, true], [false, false, false, false]], color: '#66ffff' },
-  { shapeArray: [[true, true], [true, true]], color: '#9900cc' }
+  { shapeArray: [[false, false, false, false], [false, true, true, false], [false, true, true, false], [false, false, false, false]], color: '#9900cc' }
 ]
 
 const cells = []
@@ -199,7 +199,6 @@ function newGame() {
   if (localStorage) {
     gameData.highScores = JSON.parse(localStorage.getItem('highScores')) ?? []
   } 
-  console.log(gameData.highScores[0].score)
   gameData.highScore = gameData.highScores[0].score ?? 0
   gameData.linesCleared = 0
   gameData.isGameOver = false
