@@ -197,9 +197,10 @@ function newGame() {
   gameData.level = 0
   gameData.score = 0
   if (localStorage) {
-    gameData.highScores = JSON.parse(localStorage.getItem('highScores')) ?? []
+    gameData.highScores = JSON.parse(localStorage.getItem('highScores')) || [{ name: ' ', score: 0 }]
   } 
-  gameData.highScore = gameData.highScores[0].score ?? 0
+  console.log(gameData.highScores)
+  gameData.highScore = gameData.highScores[0].score
   gameData.linesCleared = 0
   gameData.isGameOver = false
   gameData.isPaused = false
