@@ -178,7 +178,7 @@ Array.prototype.nestedForEach = function(callback) {
 }
 ```
 
-[image:947BBC86-56F5-4583-8803-4942F50C032F-21202-00026C5A6D0DA3E3/Screenshot 2021-06-29 at 13.43.19.png]
+![Screenshot](tetris_screenshot.png)
  
 ### Future Additions
 • With more time I would make the game mobile friendly.
