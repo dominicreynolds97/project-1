@@ -181,7 +181,7 @@ Array.prototype.nestedForEach = function(callback) {
 ![Screenshot](tetris_screenshot.png)
  
 ### Future Additions
-• With more time I would make the game mobile friendly.
+* With more time I would make the game mobile friendly.
 * Storing high scores in a back end rather than local storage so that players can compete. 
 
 ### Key Learnings
