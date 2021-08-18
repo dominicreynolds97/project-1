@@ -43,7 +43,7 @@ The next step was to create the Tetriminos and display them on the game screen. 
 
 ### Rotation
 To rotate the Tetriminos, I made each shape a square of booleans. I then changed the values in the nested array to rotate the piece.  I then removed it from the screen and displayed it again using the display method I mentioned above. I included a check to see if the piece could rotate. I used event listeners on the ‘X’ and ‘Z’ keys to rotate clockwise and anti-clockwise respectively. (I misspelled ‘Tetrimino’ throughout the code… Oops)
-```
+```JavaScript
 rotate(isClockwise) {
     const newShape = []
     let canRotate = true
@@ -82,7 +82,7 @@ rotate(isClockwise) {
 ### Dropping the Tetriminos
 I used Math.random() to construct a new Tetrimino at the start of the game, to make it fall down I created a method called drop() in the Tetrimino class which increments the y value of the Tetrimino and then displays it again. By using setTimeout in my playGame() function and calling itself again, I was able to get the Tetrimino to fall down at a steady rate. I used a speed variable that gets faster at the end of each level.
 
-```
+```JavaScript
 function playGame() {
   if (!gameData.isGameOver && !gameData.isPaused) {
     const newTet = gameData.tetrominos[gameData.currentTetromino].drop()
@@ -113,7 +113,7 @@ To move sideways I added a method to the class that would either increase the x 
 
 ### Collision Detection
 Every time a Tetrimino is dropped by one cell, there has to be a check to see if the cells below contain previous Tetriminos or if it is at the bottom of the grid. To do this I used the hasTetrimino boolean in the cells array that I mentioned above. I used another nested forEach to check if the cells below contained an old Tetrimino and the method would returns true if there is a collision. I also used this method to check if the game is over, by checking after discovering there is a collision, if the y value is smaller than zero. Additionally, after a collision, the hasTetrimino value of the cells containing the current Tetrimino would be changed to true, for future collision detection.
-```
+```JavaScript
  collisionDetection() {
     let hasCollided = false
     this.shapeArray.nestedForEach((cell, i, j) => {
@@ -147,7 +147,7 @@ I made two small displays on screen, to display the next Tetrimino and to show t
 
 ### Refactoring 
 I initially had all of my game data set as global variables (mostly lets), when it came time to start a new game again I would refresh the page using location.reload(). However this was not the way I wanted to do it and I wanted to add a newGame() function that would reset all of these global variables. Initially I just copy and pasted the global variables into this function and then removed the keywords, but I wan’t happy because there was a lot of repetition. Instead of this I decided to declare an empty object called gameData, and in my new game function I added keys and values to the object. This way I no longer needed to reset 15 global variables at the start of a new game. I just had to call the function again and it would change the values in the object. After this I had to update the DOM, reset the game screen and the small displays. Finally, I called my playGame() function, to get the game started. It was in this stage that I created my nestedForEach() array callback function to simplify the repeated code throughout.
-```
+```JavaScript
  collisionDetection() {
     let hasCollided = false
     this.shapeArray.nestedForEach((cell, i, j) => {
@@ -170,7 +170,7 @@ I initially had all of my game data set as global variables (mostly lets), when 
     return hasCollided
   }
 ```
-```
+```JavaScript
 Array.prototype.nestedForEach = function(callback) {
   this.forEach((e, i) => e.forEach((e2, j) => {
     return callback(this[i][j], i, j)
